@@ -1,0 +1,16 @@
+name = "cf_ai_api_copilot"
+main = "src/index.ts"
+compatibility_date = "2024-11-27"
+
+[ai]
+binding = "AI"
+
+[durable_objects]
+bindings = [
+  { name = "API_SESSION_DO", class_name = "ApiSessionDO" }
+]
+
+[[migrations]]
+tag = "v1"
+new_classes = ["ApiSessionDO"]
+

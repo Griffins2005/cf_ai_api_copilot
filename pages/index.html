@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>API Copilot on Cloudflare</title>
+    <link rel="stylesheet" href="./styles.css" />
+    <script>
+      window.CF_API_BASE =
+        window.CF_API_BASE || (location.hostname.includes("localhost") ? "http://localhost:8787" : "");
+    </script>
+  </head>
+  <body>
+    <header>
+      <h1>API Copilot on the Edge</h1>
+      <p>Paste any OpenAPI URL and chat with an AI that understands every endpoint.</p>
+    </header>
+
+    <main>
+      <section class="card">
+        <h2>1. Load an OpenAPI document</h2>
+        <form id="spec-form">
+          <label for="spec-url">OpenAPI/Swagger URL</label>
+          <div class="row">
+            <input
+              type="url"
+              id="spec-url"
+              placeholder="https://raw.githubusercontent.com/.../openapi.json"
+              required
+            />
+            <button type="submit">Load spec</button>
+          </div>
+          <small>
+            The Worker fetches the document server-side. You can also paste raw JSON or YAML into the advanced drawer in
+            the future.
+          </small>
+        </form>
+        <div id="spec-status" class="status"></div>
+      </section>
+
+      <section class="card" id="summary-card">
+        <h2>2. API digest</h2>
+        <div id="summary-content" class="placeholder">Load a spec to see the summary.</div>
+        <div id="endpoint-list"></div>
+      </section>
+
+      <section class="card" id="chat-card">
+        <h2>3. Ask the API anything</h2>
+        <div id="chat-log" class="chat-log"></div>
+        <form id="chat-form">
+          <input type="text" id="chat-input" placeholder="e.g. How do I create an order?" autocomplete="off" />
+          <button type="submit">Send</button>
+        </form>
+      </section>
+    </main>
+
+    <footer>
+      Built for the Cloudflare AI assignment • Worker + Durable Object + Workers AI + Pages
+    </footer>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js" defer></script>
+    <script type="module" src="./app.js"></script>
+  </body>
+</html>
+

@@ -1,0 +1,16 @@
+# Build outputs
+dist/
+.wrangler/
+pages/.wrangler/
+worker/.wrangler/
+
+# Dependencies
+node_modules/
+pages/node_modules/
+worker/node_modules/
+
+# Environment & temp
+.env
+.env.*
+*.log
+**/.DS_Store
