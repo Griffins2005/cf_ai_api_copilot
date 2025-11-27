@@ -1,4 +1,4 @@
-name = "cf_ai_api_copilot"
+name = "cf-ai-api-copilot"
 main = "src/index.ts"
 compatibility_date = "2024-11-27"
 workers_dev = false
