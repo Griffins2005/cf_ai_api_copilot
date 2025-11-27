@@ -12,5 +12,4 @@ bindings = [
 
 [[migrations]]
 tag = "v1"
-new_classes = ["ApiSessionDO"]
-
+new_sqlite_classes = ["ApiSessionDO"]
