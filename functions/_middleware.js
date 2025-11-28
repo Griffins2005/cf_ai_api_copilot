@@ -1,14 +1,26 @@
 export const onRequest = async ({ request, next, env }) => {
-  // API requests are simply forwarded
+  const response = await next();
   const url = new URL(request.url);
-  if (url.pathname.startsWith("/api/")) {
-    return next();
+  const apiBase = env.CF_API_BASE;
+
+  if (
+    url.pathname.startsWith("/api/") ||
+    !apiBase ||
+    !(response.headers.get("content-type") ?? "").includes("text/html")
+  ) {
+    return response;
   }
 
-  // All other routes render the HTML shell for the SPA
-  return new Response(await env.PAGES.fetch(new Request(request.url)).then((res) => res.text()), {
-    status: 200,
-    headers: { "content-type": "text/html; charset=utf-8" }
-  });
+  const safeBase = String(apiBase).replace(/"/g, '\\"');
+
+  return new HTMLRewriter()
+    .on("head", {
+      element(element) {
+        element.append(`<script>window.CF_API_BASE="${safeBase}";</script>`, {
+          html: true
+        });
+      }
+    })
+    .transform(response);
 };
 
