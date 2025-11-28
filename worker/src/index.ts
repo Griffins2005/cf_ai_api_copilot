@@ -156,6 +156,7 @@ async function handleCreateSession(request: Request, env: Env): Promise<Response
 
   try {
     const specText = body.spec ?? (await fetchSpecFromUrl(body.specUrl!));
+    const specSnippetForStorage = truncateSpec(specText);
     const parsed = parseOpenApiDocument(specText);
     const specDigest = buildSpecDigest(parsed);
     const summary = await summarizeSpec(specDigest, parsed, env);
@@ -165,7 +166,7 @@ async function handleCreateSession(request: Request, env: Env): Promise<Response
       id: sessionId,
       createdAt: new Date().toISOString(),
       summary,
-      specText,
+      specText: specSnippetForStorage,
       specDigest,
       endpoints: parsed.endpoints,
       history: [],
