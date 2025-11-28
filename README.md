@@ -8,6 +8,11 @@ API Copilot on the Edge is a Cloudflare-native assistant that ingests any OpenAP
 - **Solution**: Drop the spec URL into this Worker. It summarizes the spec, highlights key endpoints, and lets you chat follow-up questions that are grounded in the stored document.
 - **What you get**: Persistent sessions with digest, chat history, and favorite endpoints; copy‑pasteable cURL/fetch snippets; and a Pages UI so non-Worker folks can use it too—all hosted entirely on Cloudflare.
 
+**Live deployments**
+
+- Frontend (Pages): https://cf-ai-api-copilot.pages.dev/
+- Worker API: https://cf-ai-api-copilot.griffinstanui99.workers.dev/
+
 ## Architecture
 
 - **LLM** – Workers AI `@cf/meta/llama-3.3-70b-instruct` for spec summaries and conversational answers.
@@ -29,65 +34,48 @@ User ↔ Pages UI (fetch)
 ### Prerequisites
 
 - Node.js 18+
-- Wrangler (installed locally via devDependency). Run `npx wrangler login` once to link your account.
-- A Cloudflare account with Workers AI enabled in the desired account
+- Cloudflare account with Workers AI enabled
+- `wrangler` (`npm i -D wrangler` + `npx wrangler login`)
 
-### 1. Install Worker deps & run locally
+### 1. Worker API (local & remote)
 
 ```bash
 cd worker
 npm install
-npm run dev   # or npx wrangler dev
-# Run npm run dev:remote if you need actual Workers AI responses
+
+# local dev, mock AI
+npm run dev
+
+# remote dev (hits Workers AI)
+npm run dev:remote
+
+# deploy
+npm run deploy
 ```
 
-This spins up the Worker + Durable Object locally at `http://localhost:8787`.
-> Note: Workers AI bindings are unavailable in `--local` mode. The Worker falls back to a digest-only summary locally, but run `npm run dev:remote` (or `npx wrangler dev --remote`) whenever you want end-to-end AI answers.
+Endpoints:
 
-#### Local vs remote Workers AI
+| Method | Path | Description |
+| --- | --- | --- |
+| `POST` | `/api/session` | Fetch & store spec via URL or raw string |
+| `POST` | `/api/session/:id/chat` | Ask a grounded question |
+| `POST` | `/api/session/:id/favorites` | Toggle favorite endpoints |
+| `GET` | `/api/session/:id/state` | Session metadata (no raw spec) |
+| `GET` | `/healthz` | Health probe |
 
-- `npm run dev` (Miniflare) – zero external calls, ideal for iterating on routing and UI. Spec digest + metadata still work, and any chat attempts respond with an explanatory warning.
-- `npm run dev:remote` – runs the Worker on Cloudflare’s edge so Workers AI is fully available. Required for true LLM summaries/chats.
-- `wrangler deploy` – same behavior as `dev:remote`, but production.
+### 2. Cloudflare Pages UI
 
-### 2. Deploy the Worker
-
-```bash
-wrangler deploy
-```
-
-> The supplied `wrangler.toml` already binds Workers AI (`AI`) and the `ApiSessionDO`. The first deploy will run the included migration and provision the Durable Object.
-
-### 3. Use the API
-
-- `POST /api/session` `{ "specUrl": "https://..." }` – fetches the spec, stores its digest, and returns `sessionId`, summary, and endpoints.
-- `POST /api/session/:id/chat` `{ "message": "How do I create a user?" }` – conversational answers grounded in the stored spec.
-- `POST /api/session/:id/favorites` – toggle `method + path` favorites.
-- `GET /api/session/:id/history|state` – retrieve stored memory (sanitized without raw spec text).
-- `GET /` – quick readiness text with usage tips; `GET /healthz` – simple `ok` for probes.
-
-Example:
+**Local preview**
 
 ```bash
-curl -X POST http://localhost:8787/api/session \
-  -H "content-type: application/json" \
-  -d '{ "specUrl": "https://petstore.swagger.io/v2/swagger.json" }'
-```
-
-### 4. Develop & deploy the Pages UI
-
-- **Local preview**
-
-```bash
-# from repo root
 npx wrangler pages dev pages --binding CF_API_BASE=http://localhost:8787
 ```
 
-The binding populates `window.CF_API_BASE` so the UI talks to your chosen Worker (local or remote).
+**Deploy**
 
-- **Deploy**
-  1. Create a Pages project pointing at the `pages/` directory.
-  2. Set a Pages environment variable (or secret) named `CF_API_BASE` to your Worker URL (e.g. `https://your-worker-id.workers.dev`). The middleware injects this value into the HTML at runtime so the frontend always targets the correct Worker.
+1. Create a Pages project targeting `pages/`
+2. Set `CF_API_BASE = https://your-worker.workers.dev`
+3. `npx wrangler pages deploy pages`
 
 ## Project structure
 
