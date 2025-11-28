@@ -180,6 +180,7 @@ async function handleCreateSession(request: Request, env: Env): Promise<Response
       }
     };
 
+    console.log("[session:create] initializing DO", sessionId);
     await proxyToDurableObject(sessionId, { op: "init", state }, env);
 
     return jsonResponse({
@@ -481,6 +482,7 @@ export class ApiSessionDO {
       if (!payload) {
         return jsonResponse({ error: "Empty DO payload" }, 400);
       }
+      console.log("[do] op", payload.op);
       switch (payload.op) {
         case "init":
           await this.state.storage.put("state", payload.state);
@@ -497,6 +499,7 @@ export class ApiSessionDO {
           return jsonResponse({ error: "Unknown DO op" }, 400);
       }
     } catch (error) {
+      console.error("[do] failure", error);
       return jsonResponse(
         { error: "DO failure", details: error instanceof Error ? error.message : String(error) },
         500
@@ -528,6 +531,7 @@ export class ApiSessionDO {
   private async runChat(message: string): Promise<Response> {
     const state = await this.getState();
     if (!state) {
+      console.warn("[do] chat before init");
       return jsonResponse({ error: "Session not initialized" }, 404);
     }
 
