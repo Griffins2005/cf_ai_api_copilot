@@ -1,6 +1,6 @@
 import { parse as parseYaml } from "yaml";
 
-const MODEL_NAME = "@cf/meta/llama-3.3-70b-instruct" as keyof AiModels;
+const MODEL_NAME = "@cf/meta/llama-3.3-70b-instruct-fp8-fast" as keyof AiModels;
 const MAX_HISTORY_ENTRIES = 12;
 const MAX_SPEC_CHARS_FOR_PROMPT = 15000;
 const LOCAL_AI_WARNING =
