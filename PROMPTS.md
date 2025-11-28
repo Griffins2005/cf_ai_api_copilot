@@ -48,8 +48,3 @@ Cloudflare asks us to document any AI prompts we leaned on. Instead of pasting a
 > • How to message digest-only fallback when running `wrangler dev --local`.  
 > • Any other nice touches (favorites UX, demo checklist).  
 > Give concrete wording and env var names so I can drop them straight into the project.
-
----
-
-That’s the entire prompt stack. Four targeted asks, each one keeping GPT focused on the next decision. If you need to rebuild something similar, feel free to riff on them—just add your own voice.***
-

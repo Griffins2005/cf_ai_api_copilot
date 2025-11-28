@@ -1,14 +1,27 @@
 const urlParams = new URL(window.location.href).searchParams;
-const paramBase = urlParams.get("apiBase");
+const sanitizeBase = (value) => (value ?? "").replace(/\/$/, "");
+const paramBase = sanitizeBase(urlParams.get("apiBase"));
 if (paramBase) {
   localStorage.setItem("cfApiBase", paramBase);
 }
-const storedBase = localStorage.getItem("cfApiBase");
+let storedBase = sanitizeBase(localStorage.getItem("cfApiBase"));
+const locationOrigin = sanitizeBase(window.location.origin);
 const defaultBase =
   window.CF_API_BASE && window.CF_API_BASE.length > 0
-    ? window.CF_API_BASE
-    : window.location.origin.replace(/\/$/, "");
-const API_BASE = (paramBase || storedBase || defaultBase).replace(/\/$/, "");
+    ? sanitizeBase(window.CF_API_BASE)
+    : locationOrigin;
+
+if (
+  !paramBase &&
+  defaultBase &&
+  (!storedBase || storedBase === locationOrigin) &&
+  storedBase !== defaultBase
+) {
+  storedBase = defaultBase;
+  localStorage.setItem("cfApiBase", defaultBase);
+}
+
+const API_BASE = sanitizeBase(paramBase || storedBase || defaultBase);
 
 const specForm = document.getElementById("spec-form");
 const specInput = document.getElementById("spec-url");
