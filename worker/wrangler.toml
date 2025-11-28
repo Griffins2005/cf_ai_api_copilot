@@ -2,7 +2,7 @@ name = "cf-ai-api-copilot"
 main = "src/index.ts"
 compatibility_date = "2024-11-27"
 workers_dev = true
-preview_urls = false
+preview_urls = true
 
 [ai]
 binding = "AI"
