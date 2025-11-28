@@ -8,11 +8,6 @@ API Copilot on the Edge is a Cloudflare-native assistant that ingests any OpenAP
 - **Solution**: Drop the spec URL into this Worker. It summarizes the spec, highlights key endpoints, and lets you chat follow-up questions that are grounded in the stored document.
 - **What you get**: Persistent sessions with digest, chat history, and favorite endpoints; copy‑pasteable cURL/fetch snippets; and a Pages UI so non-Worker folks can use it too—all hosted entirely on Cloudflare.
 
-**Live deployments**
-
-- Frontend (Pages): https://cf-ai-api-copilot.pages.dev/
-- Worker API: https://cf-ai-api-copilot.griffinstanui99.workers.dev/
-
 ## Architecture
 
 - **LLM** – Workers AI `@cf/meta/llama-3.3-70b-instruct` for spec summaries and conversational answers.
