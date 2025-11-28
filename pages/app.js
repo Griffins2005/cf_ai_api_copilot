@@ -1,5 +1,3 @@
-const API_BASE = "https://cf-ai-api-copilot.griffinstanui99.workers.dev";
-
 const specForm = document.getElementById("spec-form");
 const specInput = document.getElementById("spec-url");
 const specStatus = document.getElementById("spec-status");
@@ -12,6 +10,17 @@ const chatLog = document.getElementById("chat-log");
 let currentSessionId = null;
 let knownFavorites = new Set();
 
+function getApiBase() {
+  const value =
+    typeof window !== "undefined" &&
+    window.CF_API_BASE &&
+    window.CF_API_BASE.trim().replace(/\/$/, "");
+  if (!value) {
+    throw new Error("CF_API_BASE is not configured. Set the Pages env var before deploying.");
+  }
+  return value;
+}
+
 specForm.addEventListener("submit", async (event) => {
   event.preventDefault();
   const url = specInput.value.trim();
@@ -19,7 +28,7 @@ specForm.addEventListener("submit", async (event) => {
   setSpecStatus("Fetching spec...");
   toggleForm(specForm, true);
   try {
-    const res = await fetch(`${API_BASE}/api/session`, {
+    const res = await fetch(`${getApiBase()}/api/session`, {
       method: "POST",
       headers: { "content-type": "application/json" },
       body: JSON.stringify({ specUrl: url })
@@ -55,7 +64,7 @@ chatForm.addEventListener("submit", async (event) => {
   appendMessage("user", message);
   appendMessage("assistant", "_Thinking with Workers AI…_");
   try {
-    const res = await fetch(`${API_BASE}/api/session/${currentSessionId}/chat`, {
+    const res = await fetch(`${getApiBase()}/api/session/${currentSessionId}/chat`, {
       method: "POST",
       headers: { "content-type": "application/json" },
       body: JSON.stringify({ message })
@@ -127,7 +136,7 @@ async function toggleFavorite(method, path, buttonEl) {
   }
   buttonEl.disabled = true;
   try {
-    const res = await fetch(`${API_BASE}/api/session/${currentSessionId}/favorites`, {
+    const res = await fetch(`${getApiBase()}/api/session/${currentSessionId}/favorites`, {
       method: "POST",
       headers: { "content-type": "application/json" },
       body: JSON.stringify({ method, path })

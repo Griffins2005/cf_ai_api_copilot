@@ -80,14 +80,14 @@ curl -X POST http://localhost:8787/api/session \
 
 ```bash
 # from repo root
-npx wrangler pages dev pages
+npx wrangler pages dev pages --binding CF_API_BASE=http://localhost:8787
 ```
 
-By default the UI talks to the deployed Worker (`https://cf-ai-api-copilot.griffinstanui99.workers.dev`). If you want it to hit a local Worker instead, edit the `API_BASE` constant near the top of `pages/app.js` before running the command.
+The binding populates `window.CF_API_BASE` so the UI talks to your chosen Worker (local or remote).
 
 - **Deploy**
   1. Create a Pages project pointing at the `pages/` directory.
-  2. Deploy. The frontend reads the Worker URL from the `API_BASE` constant in `pages/app.js`, so update that value before publishing if your Worker hostname changes.
+  2. Set a Pages environment variable (or secret) named `CF_API_BASE` to your Worker URL (e.g. `https://your-worker-id.workers.dev`). The middleware injects this value into the HTML at runtime so the frontend always targets the correct Worker.
 
 ## Project structure
 
@@ -113,7 +113,7 @@ By default the UI talks to the deployed Worker (`https://cf-ai-api-copilot.griff
 
 1. `cd worker && npm install && wrangler deploy`
 2. Create Pages project → Framework preset “None” (static) → directory `pages`
-3. Update `pages/app.js` with the correct Worker URL before publishing the Pages build
+3. Ensure the Pages env variable `CF_API_BASE` is set before publishing the Pages build
 4. Commit + push → share repo URL prefixed with `cf_ai_`
 
 Happy demoing! 🎛️
